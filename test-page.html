@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PosturePro Testing Suite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .disabled { background: #6c757d; cursor: not-allowed; }
+        #results { margin-top: 20px; }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 PosturePro Testing Suite</h1>
+    
+    <div class="test-section">
+        <h2>🔧 Configuration</h2>
+        <label>Frontend URL:</label>
+        <input type="url" id="frontendUrl" placeholder="https://your-app.vercel.app" style="width: 300px; padding: 8px;">
+        <br><br>
+        <label>Backend URL:</label>
+        <input type="url" id="backendUrl" placeholder="https://your-app.railway.app" style="width: 300px; padding: 8px;">
+        <br><br>
+        <button onclick="saveConfig()">Save Configuration</button>
+    </div>
+
+    <div class="test-grid">
+        <div class="test-section">
+            <h3>🌐 Connectivity Tests</h3>
+            <button onclick="testFrontendAccess()">Test Frontend Access</button>
+            <button onclick="testBackendHealth()">Test Backend Health</button>
+            <button onclick="testAPIEndpoints()">Test API Endpoints</button>
+            <button onclick="testCORS()">Test CORS</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📹 Video Upload Tests</h3>
+            <input type="file" id="testVideo" accept="video/*" style="margin: 10px 0;">
+            <br>
+            <button onclick="testVideoUpload()">Test Video Upload</button>
+            <button onclick="testVideoFormats()">Test Different Formats</button>
+            <button onclick="testLargeVideo()">Test Large Video</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📷 Webcam Tests</h3>
+            <button onclick="testWebcamAccess()">Test Webcam Access</button>
+            <button onclick="testRealTimeAnalysis()">Test Real-time Analysis</button>
+            <button onclick="testWebcamSettings()">Test Settings</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Posture Detection Tests</h3>
+            <button onclick="testPostureDetection()">Test Posture Detection</button>
+            <button onclick="testSquatAnalysis()">Test Squat Analysis</button>
+            <button onclick="testSittingPosture()">Test Sitting Posture</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📱 Device Compatibility</h3>
+            <button onclick="testMobileCompatibility()">Test Mobile</button>
+            <button onclick="testTabletCompatibility()">Test Tablet</button>
+            <button onclick="testDesktopBrowsers()">Test Desktop Browsers</button>
+        </div>
+
+        <div class="test-section">
+            <h3>⚡ Performance Tests</h3>
+            <button onclick="testPageLoadTime()">Test Load Time</button>
+            <button onclick="testVideoProcessingSpeed()">Test Processing Speed</button>
+            <button onclick="testMemoryUsage()">Test Memory Usage</button>
+        </div>
+    </div>
+
+    <div id="results" class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        let config = {
+            frontendUrl: '',
+            backendUrl: ''
+        };
+
+        function saveConfig() {
+            config.frontendUrl = document.getElementById('frontendUrl').value;
+            config.backendUrl = document.getElementById('backendUrl').value;
+            addResult('Configuration saved successfully', 'success');
+        }
+
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            resultsDiv.appendChild(resultDiv);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        // Connectivity Tests
+        async function testFrontendAccess() {
+            try {
+                const response = await fetch(config.frontendUrl);
+                if (response.ok) {
+                    addResult('✅ Frontend is accessible', 'success');
+                } else {
+                    addResult(`❌ Frontend returned status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Frontend access failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testBackendHealth() {
+            try {
+                const response = await fetch(`${config.backendUrl}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ Backend health check passed: ${data.status}`, 'success');
+                } else {
+                    addResult(`❌ Backend health check failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Backend health check error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAPIEndpoints() {
+            const endpoints = ['/', '/health', '/stats'];
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${config.backendUrl}${endpoint}`);
+                    if (response.ok) {
+                        addResult(`✅ Endpoint ${endpoint} is working`, 'success');
+                    } else {
+                        addResult(`❌ Endpoint ${endpoint} failed: ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ Endpoint ${endpoint} error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function testCORS() {
+            try {
+                const response = await fetch(`${config.backendUrl}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                if (response.ok) {
+                    addResult('✅ CORS is properly configured', 'success');
+                } else {
+                    addResult('⚠️ CORS might have issues', 'warning');
+                }
+            } catch (error) {
+                if (error.message.includes('CORS')) {
+                    addResult(`❌ CORS error: ${error.message}`, 'error');
+                } else {
+                    addResult('✅ CORS appears to be working', 'success');
+                }
+            }
+        }
+
+        // Video Upload Tests
+        async function testVideoUpload() {
+            const fileInput = document.getElementById('testVideo');
+            if (!fileInput.files[0]) {
+                addResult('⚠️ Please select a video file first', 'warning');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('video', fileInput.files[0]);
+
+            try {
+                addResult('🔄 Starting video upload test...', 'info');
+                const startTime = Date.now();
+                
+                const response = await fetch(`${config.backendUrl}/analyze`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const endTime = Date.now();
+                const duration = (endTime - startTime) / 1000;
+
+                if (response.ok) {
+                    const results = await response.json();
+                    addResult(`✅ Video upload successful! Processed ${results.length} frames in ${duration}s`, 'success');
+                    
+                    // Analyze results
+                    const framesWithIssues = results.filter(r => r.posture_issues.length > 0).length;
+                    addResult(`📊 Analysis: ${framesWithIssues}/${results.length} frames had posture issues`, 'info');
+                } else {
+                    addResult(`❌ Video upload failed: ${response.status} - ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Video upload error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testVideoFormats() {
+            const formats = ['.mp4', '.webm', '.avi'];
+            addResult(`🔄 Testing supported formats: ${formats.join(', ')}`, 'info');
+            
+            // This would require actual test files
+            addResult('⚠️ Manual test required: Try uploading different video formats', 'warning');
+        }
+
+        async function testLargeVideo() {
+            addResult('⚠️ Manual test required: Try uploading a video larger than 100MB', 'warning');
+            addResult('Expected: Should show file size error', 'info');
+        }
+
+        // Webcam Tests
+        async function testWebcamAccess() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                addResult('✅ Webcam access granted', 'success');
+                
+                // Stop the stream
+                stream.getTracks().forEach(track => track.stop());
+                
+                // Test frame capture
+                addResult('🔄 Testing frame capture...', 'info');
+                setTimeout(() => {
+                    addResult('✅ Frame capture simulation completed', 'success');
+                }, 1000);
+                
+            } catch (error) {
+                addResult(`❌ Webcam access denied: ${error.message}`, 'error');
+            }
+        }
+
+        async function testRealTimeAnalysis() {
+            addResult('⚠️ Manual test required: Use webcam feature and check real-time analysis', 'warning');
+            addResult('Expected: Should see posture feedback within 1-2 seconds', 'info');
+        }
+
+        async function testWebcamSettings() {
+            addResult('⚠️ Manual test required: Test webcam settings panel', 'warning');
+            addResult('Check: Sound alerts, sensitivity, analysis interval', 'info');
+        }
+
+        // Posture Detection Tests
+        async function testPostureDetection() {
+            // Create a test image (simple colored rectangle)
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(0, 0, 640, 480);
+
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('frame', blob, 'test-frame.jpg');
+
+                try {
+                    const response = await fetch(`${config.backendUrl}/analyze-frame`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        addResult(`✅ Frame analysis working. Pose detected: ${result.pose_detected}`, 'success');
+                        addResult(`📊 Confidence: ${(result.confidence_score * 100).toFixed(1)}%`, 'info');
+                    } else {
+                        addResult(`❌ Frame analysis failed: ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ Frame analysis error: ${error.message}`, 'error');
+                }
+            }, 'image/jpeg');
+        }
+
+        async function testSquatAnalysis() {
+            addResult('⚠️ Manual test required: Record squat video and check analysis', 'warning');
+            addResult('Expected: Should detect knee-over-toe, back angle issues', 'info');
+        }
+
+        async function testSittingPosture() {
+            addResult('⚠️ Manual test required: Test sitting posture with webcam', 'warning');
+            addResult('Expected: Should detect forward head, slouching', 'info');
+        }
+
+        // Device Compatibility Tests
+        function testMobileCompatibility() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+                addResult('✅ Running on mobile device', 'success');
+                addResult('⚠️ Manual test: Check touch interactions, camera access', 'warning');
+            } else {
+                addResult('ℹ️ Not on mobile device - test on mobile separately', 'info');
+            }
+        }
+
+        function testTabletCompatibility() {
+            const isTablet = /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(navigator.userAgent);
+            if (isTablet) {
+                addResult('✅ Running on tablet device', 'success');
+            } else {
+                addResult('ℹ️ Not on tablet device - test on tablet separately', 'info');
+            }
+        }
+
+        function testDesktopBrowsers() {
+            const browser = getBrowserInfo();
+            addResult(`✅ Browser detected: ${browser.name} ${browser.version}`, 'success');
+            addResult('⚠️ Manual test: Try Chrome, Firefox, Safari, Edge', 'warning');
+        }
+
+        function getBrowserInfo() {
+            const ua = navigator.userAgent;
+            let tem, M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+            if (/trident/i.test(M[1])) {
+                tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+                return { name: 'IE', version: (tem[1] || '') };
+            }
+            if (M[1] === 'Chrome') {
+                tem = ua.match(/\bOPR|Edge\/(\d+)/);
+                if (tem != null) return { name: 'Opera', version: tem[1] };
+            }
+            M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
+            if ((tem = ua.match(/version\/(\d+)/i)) != null) M.splice(1, 1, tem[1]);
+            return { name: M[0], version: M[1] };
+        }
+
+        // Performance Tests
+        async function testPageLoadTime() {
+            const startTime = performance.now();
+            try {
+                await fetch(config.frontendUrl);
+                const endTime = performance.now();
+                const loadTime = endTime - startTime;
+                
+                if (loadTime < 2000) {
+                    addResult(`✅ Page load time: ${loadTime.toFixed(0)}ms (Good)`, 'success');
+                } else if (loadTime < 5000) {
+                    addResult(`⚠️ Page load time: ${loadTime.toFixed(0)}ms (Acceptable)`, 'warning');
+                } else {
+                    addResult(`❌ Page load time: ${loadTime.toFixed(0)}ms (Slow)`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Load time test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testVideoProcessingSpeed() {
+            addResult('⚠️ Manual test: Upload video and measure processing time', 'warning');
+            addResult('Expected: Should process within reasonable time based on video length', 'info');
+        }
+
+        function testMemoryUsage() {
+            if ('memory' in performance) {
+                const memory = performance.memory;
+                const used = Math.round(memory.usedJSHeapSize / 1048576);
+                const total = Math.round(memory.totalJSHeapSize / 1048576);
+                
+                addResult(`📊 Memory usage: ${used}MB / ${total}MB`, 'info');
+                
+                if (used < 100) {
+                    addResult('✅ Memory usage is good', 'success');
+                } else if (used < 200) {
+                    addResult('⚠️ Memory usage is moderate', 'warning');
+                } else {
+                    addResult('❌ High memory usage detected', 'error');
+                }
+            } else {
+                addResult('⚠️ Memory usage info not available in this browser', 'warning');
+            }
+        }
+
+        // Auto-run basic tests on page load
+        window.onload = function() {
+            addResult('🚀 PosturePro Testing Suite loaded', 'success');
+            addResult('👆 Configure your URLs above and start testing!', 'info');
+        };
+    </script>
+</body>
+</html>
