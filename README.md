@@ -4,7 +4,7 @@
 
 ## 🚀 Live Demo
 
-- **Deployed Web App** - 
+- **Deployed Web App** - https://v0-posture-pro-web-app.vercel.app/
 - **Demo Video** - 
 
 
