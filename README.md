@@ -5,7 +5,8 @@
 ## 🚀 Live Demo
 
 - **Deployed Web App** - https://v0-posture-pro-web-app.vercel.app/
-- **Demo Video** - 
+- **Demo Video** - https://drive.google.com/file/d/1kl3ZEftmcMoTg998QO2ITqUaZn3tKwuu/view?usp=sharing
+- **Github link** - https://github.com/gurusaiss/posture-pro
 
 
 ## 🎯 Overview
