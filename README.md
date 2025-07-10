@@ -391,11 +391,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Vercel](https://vercel.com/) for frontend hosting
 - [Railway](https://railway.app/) for backend hosting
 
-## 📞 Support
-
-For questions or support, please contact:
-- Email: [your-email@example.com]
-- GitHub Issues: [Your GitHub repo issues URL]
 
 ## 🎯 Project Structure
 
