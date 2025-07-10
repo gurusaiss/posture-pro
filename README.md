@@ -4,23 +4,9 @@
 
 ## 🚀 Live Demo
 
-- **Frontend**: [https://posture-pro.vercel.app](https://posture-pro.vercel.app) *(Replace with your actual URL)*
-- **Backend API**: [https://posture-pro-api.railway.app](https://posture-pro-api.railway.app) *(Replace with your actual URL)*
-- **API Documentation**: [https://posture-pro-api.railway.app/docs](https://posture-pro-api.railway.app/docs)
-- **Demo Video**: [https://youtu.be/your-video-id](https://youtu.be/your-video-id) *(Replace with your actual video URL)*
+- **Deployed Web App** - 
+- **Demo Video** - 
 
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Rule-Based Logic](#rule-based-logic)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Documentation](#api-documentation)
-- [Deployment](#deployment)
-- [Testing](#testing)
-- [Contributing](#contributing)
 
 ## 🎯 Overview
 
@@ -128,6 +114,7 @@ neck_angle = calculate_angle(ear, shoulder, vertical)
 if neck_angle > 30:
     flag_issue("neck_bend", "high")
 \`\`\`
+
 
 ## 🚀 Installation
 
