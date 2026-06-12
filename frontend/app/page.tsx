@@ -2,16 +2,21 @@
 
 import type React from "react"
 import { useState, useRef } from "react"
-import { Upload, Camera, RotateCcw, Activity, Users, TrendingUp } from "lucide-react"
+import { Upload, Camera, RotateCcw, Activity, Users, TrendingUp, BarChart2, History, LogOut, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import VideoAnalyzer from "@/components/video-analyzer"
 import WebcamAnalyzer from "@/components/webcam-analyzer"
+import AuthModal from "@/components/auth-modal"
+import { useAuth } from "@/context/auth-context"
 
 export default function HomePage() {
   const [mode, setMode] = useState<"home" | "upload" | "webcam">("home")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { user, loading, signOut } = useAuth()
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -24,10 +29,10 @@ export default function HomePage() {
   const handleReset = () => {
     setMode("home")
     setSelectedFile(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
+    if (fileInputRef.current) fileInputRef.current.value = ""
   }
+
+  const displayName = user?.user_metadata?.name || user?.email?.split("@")[0] || "User"
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -35,20 +40,70 @@ export default function HomePage() {
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+            <button onClick={handleReset} className="flex items-center space-x-2">
               <Activity className="h-8 w-8 text-blue-600" />
               <h1 className="text-2xl font-bold text-gray-900">PosturePro</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm">
-                About
-              </Button>
-              <Button variant="ghost" size="sm">
-                Features
-              </Button>
-              <Button variant="outline" size="sm">
-                Sign In
-              </Button>
+            </button>
+
+            <div className="flex items-center space-x-2">
+              {user && (
+                <>
+                  <a href="/dashboard">
+                    <Button variant="ghost" size="sm">
+                      <BarChart2 className="h-4 w-4 mr-1" />
+                      Dashboard
+                    </Button>
+                  </a>
+                  <a href="/history">
+                    <Button variant="ghost" size="sm">
+                      <History className="h-4 w-4 mr-1" />
+                      History
+                    </Button>
+                  </a>
+                </>
+              )}
+
+              {!loading && (
+                <>
+                  {user ? (
+                    <div className="relative">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowUserMenu(!showUserMenu)}
+                        className="flex items-center gap-1"
+                      >
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-medium">
+                          {displayName[0].toUpperCase()}
+                        </div>
+                        <span className="hidden sm:inline max-w-24 truncate">{displayName}</span>
+                        <ChevronDown className="h-3 w-3" />
+                      </Button>
+                      {showUserMenu && (
+                        <div className="absolute right-0 top-10 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-44 z-50">
+                          <a href="/dashboard" className="flex items-center px-3 py-2 text-sm hover:bg-gray-50">
+                            <BarChart2 className="h-4 w-4 mr-2 text-gray-500" /> Dashboard
+                          </a>
+                          <a href="/history" className="flex items-center px-3 py-2 text-sm hover:bg-gray-50">
+                            <History className="h-4 w-4 mr-2 text-gray-500" /> History
+                          </a>
+                          <div className="border-t border-gray-100 my-1" />
+                          <button
+                            onClick={() => { signOut(); setShowUserMenu(false) }}
+                            className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                          >
+                            <LogOut className="h-4 w-4 mr-2" /> Sign Out
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <Button onClick={() => setShowAuthModal(true)} variant="outline" size="sm">
+                      Sign In
+                    </Button>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -57,15 +112,15 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-8">
         {mode === "home" && (
           <div className="max-w-6xl mx-auto">
-            {/* Hero Section */}
+            {/* Hero */}
             <div className="text-center mb-12">
               <h1 className="text-5xl font-bold text-gray-900 mb-4">
                 Perfect Your Posture with
                 <span className="text-blue-600"> AI Technology</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                Get real-time feedback on your posture during exercises and daily activities. Upload videos or use your
-                webcam for instant analysis and improvement tips.
+                Real-time posture feedback using MediaPipe computer vision. Upload a video or use your webcam for
+                instant analysis, session tracking, and progress insights.
               </p>
 
               {/* Stats */}
@@ -74,15 +129,15 @@ export default function HomePage() {
                   <div className="flex items-center justify-center mb-3">
                     <Users className="h-8 w-8 text-blue-600" />
                   </div>
-                  <div className="text-3xl font-bold text-gray-900 mb-1">10K+</div>
-                  <div className="text-gray-600">Users Improved</div>
+                  <div className="text-3xl font-bold text-gray-900 mb-1">33</div>
+                  <div className="text-gray-600">MediaPipe Landmarks</div>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 border border-gray-200">
                   <div className="flex items-center justify-center mb-3">
                     <Activity className="h-8 w-8 text-green-600" />
                   </div>
                   <div className="text-3xl font-bold text-gray-900 mb-1">95%</div>
-                  <div className="text-gray-600">Accuracy Rate</div>
+                  <div className="text-gray-600">Detection Accuracy</div>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 border border-gray-200">
                   <div className="flex items-center justify-center mb-3">
@@ -105,26 +160,20 @@ export default function HomePage() {
                     <div>
                       <CardTitle className="text-xl">Upload Video Analysis</CardTitle>
                       <CardDescription className="text-base">
-                        Analyze posture in your recorded workout or daily activity videos
+                        Analyze posture in recorded workout or daily activity videos
                       </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="video/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
+                  <input ref={fileInputRef} type="file" accept="video/*" onChange={handleFileSelect} className="hidden" />
                   <Button onClick={() => fileInputRef.current?.click()} className="w-full h-12 text-lg" size="lg">
                     Choose Video File
                   </Button>
                   <div className="mt-4 space-y-2">
                     <p className="text-sm text-gray-500">✓ Supports MP4, WebM, AVI formats</p>
                     <p className="text-sm text-gray-500">✓ Frame-by-frame analysis</p>
-                    <p className="text-sm text-gray-500">✓ Detailed posture report</p>
+                    <p className="text-sm text-gray-500">✓ Session saved to your history</p>
                   </div>
                 </CardContent>
               </Card>
@@ -138,7 +187,7 @@ export default function HomePage() {
                     <div>
                       <CardTitle className="text-xl">Live Webcam Analysis</CardTitle>
                       <CardDescription className="text-base">
-                        Real-time posture monitoring using your camera
+                        Real-time posture monitoring with live score gauge
                       </CardDescription>
                     </div>
                   </div>
@@ -148,13 +197,27 @@ export default function HomePage() {
                     Start Live Analysis
                   </Button>
                   <div className="mt-4 space-y-2">
-                    <p className="text-sm text-gray-500">✓ Instant feedback alerts</p>
-                    <p className="text-sm text-gray-500">✓ Privacy-focused (no recording)</p>
-                    <p className="text-sm text-gray-500">✓ Real-time corrections</p>
+                    <p className="text-sm text-gray-500">✓ Live posture score 0–100</p>
+                    <p className="text-sm text-gray-500">✓ Color-coded visual feedback</p>
+                    <p className="text-sm text-gray-500">✓ Session saved to history</p>
                   </div>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Sign-in prompt if not authed */}
+            {!user && !loading && (
+              <div className="text-center py-8 bg-white/60 rounded-xl border border-gray-200">
+                <BarChart2 className="h-10 w-10 text-blue-600 mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Track Your Progress Over Time</h3>
+                <p className="text-gray-600 mb-4 max-w-md mx-auto">
+                  Sign in to save every session, view weekly trends, and see your posture improvement over time.
+                </p>
+                <Button onClick={() => setShowAuthModal(true)} size="lg">
+                  Sign In Free
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
@@ -190,6 +253,13 @@ export default function HomePage() {
           </div>
         )}
       </div>
+
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+
+      {/* Close user menu on outside click */}
+      {showUserMenu && (
+        <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
+      )}
     </div>
   )
 }
