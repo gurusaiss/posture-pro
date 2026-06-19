@@ -1,0 +1,54 @@
+name: Keep Supabase Alive
+
+# Supabase free-tier projects pause after 7 days of database inactivity.
+# This job runs a lightweight query against the database every 2 days so the
+# project never sleeps — important for keeping the live portfolio demo responsive.
+#
+# Setup (one-time): add two repository secrets under
+#   Settings → Secrets and variables → Actions → New repository secret
+#     SUPABASE_URL       e.g. https://your-project-ref.supabase.co
+#     SUPABASE_ANON_KEY  the anon/public key from Supabase → Settings → API
+# (The anon key is safe to store as a secret; it's the same public key the
+#  frontend already ships in NEXT_PUBLIC_SUPABASE_ANON_KEY.)
+
+on:
+  schedule:
+    # At 06:00 UTC every 2 days. Max gap is ~2 days — well under the 7-day pause window.
+    - cron: "0 6 */2 * *"
+  # Allow manual runs from the Actions tab (useful to wake the DB before a demo).
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase database
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::SUPABASE_URL and SUPABASE_ANON_KEY repository secrets are not set."
+            echo "Add them under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+          # A real SELECT against a table is what counts as database activity.
+          # RLS may return zero rows for an anonymous request — that's fine, the
+          # query still executes on Postgres and resets the inactivity timer.
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${SUPABASE_URL}/rest/v1/analysis_sessions?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+
+          echo "Supabase responded with HTTP ${status}"
+
+          # Any response in the 2xx–4xx range means the request reached the
+          # database (200 = rows/empty, 401/403 = RLS blocked but DB was hit).
+          # Only a 5xx or connection failure indicates the ping did not land.
+          if [ "$status" -ge 500 ] || [ "$status" -eq 000 ]; then
+            echo "::error::Supabase ping failed (HTTP ${status})."
+            exit 1
+          fi
+
+          echo "Keep-alive ping successful — database activity registered."
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
