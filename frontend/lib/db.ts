@@ -60,6 +60,17 @@ export async function saveSession(data: SessionData): Promise<string | null> {
   return session.id
 }
 
+export async function updateSessionRecommendation(
+  sessionId: string,
+  recommendation: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("analysis_sessions")
+    .update({ ai_recommendation: recommendation })
+    .eq("id", sessionId)
+  if (error) console.error("Error updating recommendation:", error)
+}
+
 export async function getSessions() {
   const { data, error } = await supabase
     .from("analysis_sessions")

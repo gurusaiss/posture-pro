@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useRef } from "react"
-import { Upload, Camera, RotateCcw, Activity, Users, TrendingUp, BarChart2, History, LogOut, ChevronDown } from "lucide-react"
+import { Upload, Camera, RotateCcw, Activity, Users, TrendingUp, BarChart2, History, LogOut, ChevronDown, Dumbbell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import VideoAnalyzer from "@/components/video-analyzer"
@@ -60,6 +60,12 @@ export default function HomePage() {
                       History
                     </Button>
                   </a>
+                  <a href="/exercises">
+                    <Button variant="ghost" size="sm">
+                      <Dumbbell className="h-4 w-4 mr-1" />
+                      Exercises
+                    </Button>
+                  </a>
                 </>
               )}
 
@@ -86,6 +92,9 @@ export default function HomePage() {
                           </a>
                           <a href="/history" className="flex items-center px-3 py-2 text-sm hover:bg-gray-50">
                             <History className="h-4 w-4 mr-2 text-gray-500" /> History
+                          </a>
+                          <a href="/exercises" className="flex items-center px-3 py-2 text-sm hover:bg-gray-50">
+                            <Dumbbell className="h-4 w-4 mr-2 text-gray-500" /> Exercise Library
                           </a>
                           <div className="border-t border-gray-100 my-1" />
                           <button

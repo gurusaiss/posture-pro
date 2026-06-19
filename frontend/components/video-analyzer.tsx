@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { saveSession } from "@/lib/db"
 import { useAuth } from "@/context/auth-context"
+import AIRecommendationsCard from "./ai-recommendations-card"
 
 interface PostureIssue {
   type: string
@@ -39,6 +40,7 @@ export default function VideoAnalyzer({ file }: VideoAnalyzerProps) {
   const [videoUrl, setVideoUrl] = useState("")
   const [analysisProgress, setAnalysisProgress] = useState(0)
   const [sessionSaved, setSessionSaved] = useState(false)
+  const [sessionId, setSessionId] = useState<string | null>(null)
 
   const { user } = useAuth()
 
@@ -109,7 +111,10 @@ export default function VideoAnalyzer({ file }: VideoAnalyzerProps) {
       issues: allIssues.slice(0, 500),
     })
 
-    if (id) setSessionSaved(true)
+    if (id) {
+      setSessionSaved(true)
+      setSessionId(id)
+    }
   }
 
   const analyzeVideo = async () => {
@@ -295,6 +300,16 @@ export default function VideoAnalyzer({ file }: VideoAnalyzerProps) {
             <div className="text-xs text-gray-500 mt-1">Frames with Issues</div>
           </Card>
         </div>
+      )}
+
+      {/* AI personalized recommendations after analysis */}
+      {sessionId && analysisResults.length > 0 && !isAnalyzing && (
+        <AIRecommendationsCard
+          sessionId={sessionId}
+          issues={Array.from(new Set(analysisResults.flatMap((r) => r.posture_issues.map((i) => i.type))))}
+          goodPosturePct={goodPct}
+          sessionType="video"
+        />
       )}
 
       {/* Current Issues at playhead */}

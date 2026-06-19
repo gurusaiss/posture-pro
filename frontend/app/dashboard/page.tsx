@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Activity, TrendingUp, Flame, Clock, Award, AlertCircle, RotateCcw } from "lucide-react"
+import { Activity, TrendingUp, Flame, Clock, Award, AlertCircle, RotateCcw, Dumbbell, Printer } from "lucide-react"
 import {
   LineChart,
   Line,
@@ -74,10 +74,25 @@ export default function DashboardPage() {
             <Activity className="h-7 w-7 text-blue-600" />
             <span className="text-xl font-bold text-gray-900">PosturePro</span>
           </a>
-          <div className="flex items-center gap-3">
-            <a href="/history">
-              <Button variant="ghost" size="sm">Session History</Button>
+          <div className="flex items-center gap-2">
+            <a href="/exercises">
+              <Button variant="ghost" size="sm">
+                <Dumbbell className="h-4 w-4 mr-1" />
+                Exercises
+              </Button>
             </a>
+            <a href="/history">
+              <Button variant="ghost" size="sm">History</Button>
+            </a>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.print()}
+              className="hidden sm:flex"
+            >
+              <Printer className="h-4 w-4 mr-1" />
+              Print Report
+            </Button>
             <a href="/">
               <Button variant="outline" size="sm">
                 <RotateCcw className="h-4 w-4 mr-1" /> New Session
@@ -87,6 +102,13 @@ export default function DashboardPage() {
         </div>
       </nav>
 
+      <style>{`
+        @media print {
+          nav, button, a[href="/"] { display: none !important; }
+          body { background: white !important; }
+          .container { max-width: 100% !important; }
+        }
+      `}</style>
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Welcome back, {displayName}!</h1>

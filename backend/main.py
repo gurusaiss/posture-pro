@@ -77,66 +77,78 @@ def calculate_angle(point1, point2, point3):
         return 0.0
 
 def analyze_posture(landmarks) -> List[PostureIssue]:
-    """Analyze posture based on MediaPipe landmarks"""
+    """Analyze posture from MediaPipe landmarks (5 checks)."""
     issues = []
-    
+
     if not landmarks:
         return issues
-    
+
     try:
-        # Get key landmarks
-        nose = landmarks[mp_pose.PoseLandmark.NOSE.value]
+        nose          = landmarks[mp_pose.PoseLandmark.NOSE.value]
         left_shoulder = landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value]
-        right_shoulder = landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value]
-        left_hip = landmarks[mp_pose.PoseLandmark.LEFT_HIP.value]
-        right_hip = landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value]
-        left_ear = landmarks[mp_pose.PoseLandmark.LEFT_EAR.value]
-        right_ear = landmarks[mp_pose.PoseLandmark.RIGHT_EAR.value]
-        
-        # Calculate midpoints
+        right_shoulder= landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value]
+        left_hip      = landmarks[mp_pose.PoseLandmark.LEFT_HIP.value]
+        right_hip     = landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value]
+        left_ear      = landmarks[mp_pose.PoseLandmark.LEFT_EAR.value]
+        right_ear     = landmarks[mp_pose.PoseLandmark.RIGHT_EAR.value]
+
+        # Confidence filter — require at least 5 of 7 key landmarks to be reliably visible.
+        # Prevents false positives from partially occluded or distant subjects.
+        key_lms = [nose, left_shoulder, right_shoulder, left_ear, right_ear, left_hip, right_hip]
+        if sum(1 for lm in key_lms if lm.visibility > 0.5) < 5:
+            return issues
+
         shoulder_mid_x = (left_shoulder.x + right_shoulder.x) / 2
         shoulder_mid_y = (left_shoulder.y + right_shoulder.y) / 2
-        hip_mid_x = (left_hip.x + right_hip.x) / 2
-        hip_mid_y = (left_hip.y + right_hip.y) / 2
-        ear_mid_x = (left_ear.x + right_ear.x) / 2
-        
-        # 1. Forward Head Posture Detection
-        head_forward_threshold = 0.05
-        if ear_mid_x > shoulder_mid_x + head_forward_threshold:
+        hip_mid_x      = (left_hip.x + right_hip.x) / 2
+        ear_mid_x      = (left_ear.x + right_ear.x) / 2
+
+        # 1. Forward Head Posture — ears pushed ahead of shoulder line (side-view signal)
+        if ear_mid_x > shoulder_mid_x + 0.05:
             issues.append(PostureIssue(
                 type="neck_forward",
-                message="Forward head posture detected - align your head over your shoulders",
-                severity="medium"
+                message="Forward head posture — align your head directly over your shoulders",
+                severity="medium",
             ))
-        
-        # 2. Slouching Detection (Back Alignment)
-        back_alignment_threshold = 0.04
-        if abs(shoulder_mid_x - hip_mid_x) > back_alignment_threshold:
-            if shoulder_mid_x > hip_mid_x:
-                issues.append(PostureIssue(
-                    type="back_slouch",
-                    message="Slouching detected - straighten your back and engage core",
-                    severity="high"
-                ))
-        
-        # 3. Shoulder Level Check
-        shoulder_height_diff = abs(left_shoulder.y - right_shoulder.y)
-        if shoulder_height_diff > 0.03:
-            higher_shoulder = "left" if left_shoulder.y < right_shoulder.y else "right"
+
+        # 2. Slouching / Spinal Misalignment
+        if abs(shoulder_mid_x - hip_mid_x) > 0.04 and shoulder_mid_x > hip_mid_x:
+            issues.append(PostureIssue(
+                type="back_slouch",
+                message="Slouching detected — straighten your back and engage your core",
+                severity="high",
+            ))
+
+        # 3. Uneven Shoulders
+        if abs(left_shoulder.y - right_shoulder.y) > 0.03:
+            higher = "left" if left_shoulder.y < right_shoulder.y else "right"
             issues.append(PostureIssue(
                 type="uneven_shoulders",
-                message=f"Uneven shoulders detected - lower your {higher_shoulder} shoulder",
-                severity="low"
+                message=f"Uneven shoulders — lower your {higher} shoulder",
+                severity="low",
             ))
-        
+
+        # 4. Head Drop (phone neck / looking down).
+        # In MediaPipe Y increases downward, so nose.y > shoulder_mid_y means head is lower.
+        if nose.y - shoulder_mid_y > 0.30:
+            issues.append(PostureIssue(
+                type="head_drop",
+                message="Head dropping forward/down — raise your screen or phone to eye level",
+                severity="medium",
+            ))
+
+        # 5. Shoulder Hunch — shoulders raised close to ears (stress/tension posture)
+        if (abs(left_shoulder.y - left_ear.y) < 0.07
+                or abs(right_shoulder.y - right_ear.y) < 0.07):
+            issues.append(PostureIssue(
+                type="shoulder_hunch",
+                message="Shoulders raised toward ears — relax and drop your shoulders",
+                severity="low",
+            ))
+
     except Exception as e:
         logger.error(f"Error in posture analysis: {e}")
-        issues.append(PostureIssue(
-            type="analysis_error",
-            message="Error occurred during posture analysis",
-            severity="low"
-        ))
-    
+
     return issues
 
 @app.get("/")

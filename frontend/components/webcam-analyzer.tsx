@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import PostureScoreGauge from "@/components/posture-score-gauge"
 import { saveSession, type IssueLog } from "@/lib/db"
 import { useAuth } from "@/context/auth-context"
+import AIRecommendationsCard from "./ai-recommendations-card"
 
 interface PostureIssue {
   type: string
@@ -47,6 +48,9 @@ export default function WebcamAnalyzer() {
   const [error, setError] = useState("")
   const [postureScore, setPostureScore] = useState(100)
   const [sessionSaved, setSessionSaved] = useState(false)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [sessionIssueTypes, setSessionIssueTypes] = useState<string[]>([])
+  const [sessionGoodPct, setSessionGoodPct] = useState(0)
   const [settings, setSettings] = useState({
     soundAlerts: true,
     sensitivity: "medium",
@@ -138,9 +142,15 @@ export default function WebcamAnalyzer() {
         issues: sessionIssuesRef.current.slice(0, 500),
       })
 
-      // Guard setState — component may have unmounted while awaiting saveSession
       if (id && isMountedRef.current) {
+        const uniqueTypes = Array.from(new Set(sessionIssuesRef.current.map((i) => i.issueType)))
+        const goodPct = totalFramesRef.current > 0
+          ? Math.round((goodFramesRef.current / totalFramesRef.current) * 100)
+          : 0
         setSessionSaved(true)
+        setSessionId(id)
+        setSessionIssueTypes(uniqueTypes)
+        setSessionGoodPct(goodPct)
       }
     }
   }
@@ -296,6 +306,16 @@ export default function WebcamAnalyzer() {
             </Button>
           </a>
         </div>
+      )}
+
+      {/* AI personalized recommendations after session ends */}
+      {sessionSaved && sessionId && (
+        <AIRecommendationsCard
+          sessionId={sessionId}
+          issues={sessionIssueTypes}
+          goodPosturePct={sessionGoodPct}
+          sessionType="webcam"
+        />
       )}
 
       {!user && (
