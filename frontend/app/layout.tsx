@@ -7,7 +7,7 @@ import { AuthProvider } from "@/context/auth-context"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "PosturePro - AI-Powered Posture Detection",
+  title: "PosturePro | AI-Powered Posture Detection",
   description: "Real-time posture analysis using computer vision and AI",
 }
 
