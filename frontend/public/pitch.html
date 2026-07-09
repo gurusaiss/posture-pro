@@ -3,673 +3,751 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="AI-powered posture detection that protects your team's health and your bottom line. Real-time alerts, personalized exercises, HR dashboard.">
+<meta name="description" content="PosturePro — AI posture detection that cuts workplace injury costs by 30%.">
 <title>PosturePro | AI Posture Intelligence for Teams</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23060B12'/><rect x='11' y='5' width='10' height='5' rx='2' fill='%2300E5A0'/><rect x='11' y='12' width='10' height='5' rx='2' fill='%2300E5A0'/><rect x='11' y='19' width='10' height='5' rx='2' fill='%2300E5A0' opacity='.7'/><rect x='11' y='26' width='10' height='5' rx='2' fill='%2300E5A0' opacity='.4'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23040810'/><rect x='9' y='4' width='14' height='5' rx='2' fill='%2300E5A0'/><rect x='9' y='11' width='14' height='5' rx='2' fill='%2300E5A0'/><rect x='9' y='18' width='14' height='5' rx='2' fill='%2300E5A0' opacity='.7'/><rect x='9' y='25' width='14' height='5' rx='2' fill='%2300E5A0' opacity='.4'/></svg>">
 <style>
-:root {
-  --bg: #060B12;
-  --surface: #0C1420;
-  --surface-2: #111C2A;
-  --border: rgba(255,255,255,0.07);
-  --border-s: rgba(255,255,255,0.13);
-  --accent: #00E5A0;
-  --accent-dim: rgba(0,229,160,0.08);
-  --accent-glow: rgba(0,229,160,0.22);
-  --text: #EEF2FF;
-  --t2: rgba(238,242,255,0.58);
-  --t3: rgba(238,242,255,0.28);
-  color-scheme: dark;
-}
+/* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;background:var(--bg)}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
-  line-height:1.6;
-  overflow-x:hidden;
+html{font-size:18px;scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+
+/* ── TOKENS ── */
+:root{
+  --bg:        #04080F;
+  --bg2:       #080D16;
+  --bg3:       #0C1320;
+  --accent:    #00E5A0;
+  --a10:       rgba(0,229,160,.10);
+  --a20:       rgba(0,229,160,.20);
+  --red:       #FF3347;
+  --r10:       rgba(255,51,71,.10);
+  --amber:     #FFAA00;
+  --m10:       rgba(255,170,0,.10);
+  --text:      #EEF2FF;
+  --t60:       rgba(238,242,255,.60);
+  --t30:       rgba(238,242,255,.30);
+  --t10:       rgba(238,242,255,.10);
+  --rule:      rgba(238,242,255,.08);
+  --mono:      'Courier New',Courier,monospace;
 }
 
-/* ── UTILITY ── */
-.eyebrow{
-  font-size:10.5px;font-weight:700;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--accent);
-  display:inline-flex;align-items:center;gap:10px;
+body{
+  background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  line-height:1.5;overflow-x:hidden;
 }
-.eyebrow::before{content:'';display:block;width:18px;height:1.5px;background:var(--accent)}
-.container{max-width:1140px;margin:0 auto;padding:0 clamp(1.25rem,5vw,3.5rem)}
-.btn{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:11px 24px;border-radius:9px;
-  font-size:13.5px;font-weight:600;text-decoration:none;
-  cursor:pointer;border:none;transition:all .18s;white-space:nowrap;
-}
-.btn-accent{background:var(--accent);color:#060B12}
-.btn-accent:hover{opacity:.88;box-shadow:0 0 28px var(--accent-glow);transform:translateY(-1px)}
-.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--border-s)}
-.btn-ghost:hover{background:var(--surface-2);color:var(--text)}
-.fade-up{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
-.fade-up.visible{opacity:1;transform:none}
+
+/* ── UTILITIES ── */
+.up{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}
+.up.in{opacity:1;transform:none}
+.mono{font-family:var(--mono)}
+section{padding:clamp(4rem,9vw,7rem) clamp(1.5rem,6vw,4.5rem)}
+hr.rule{border:none;border-top:1px solid var(--rule);margin:0}
 
 /* ── NAV ── */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  height:58px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 clamp(1.25rem,5vw,3.5rem);
-  background:rgba(6,11,18,.86);backdrop-filter:blur(18px);
-  border-bottom:1px solid var(--border);
+  position:fixed;inset:0 0 auto;z-index:200;height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(1.5rem,5vw,4rem);
+  background:rgba(4,8,15,.88);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--rule);
 }
-.nav-logo{font-weight:800;font-size:15px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
-.pulse{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);animation:pulse 2.4s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--accent)}50%{opacity:.6;box-shadow:0 0 20px var(--accent)}}
-.nav-r{display:flex;align-items:center;gap:10px}
+.logo{
+  display:flex;align-items:center;gap:8px;
+  font-weight:800;font-size:.9rem;letter-spacing:-.01em;
+}
+.pulse{
+  width:7px;height:7px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 0 var(--a20);
+  animation:pulse 2.5s ease infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--a20)}60%{box-shadow:0 0 0 8px transparent}}
+.nav-cta{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 18px;border-radius:5px;
+  background:var(--accent);color:#04080F;
+  font-size:.78rem;font-weight:800;letter-spacing:.02em;
+  text-transform:uppercase;cursor:pointer;border:none;
+  transition:opacity .15s,box-shadow .15s;
+}
+.nav-cta:hover{opacity:.85;box-shadow:0 0 28px var(--a20)}
 
-/* ── HERO ── */
+/* ══ HERO ══ */
 .hero{
-  min-height:100svh;display:flex;flex-direction:column;
-  justify-content:center;position:relative;overflow:hidden;
-  padding:clamp(6rem,12vw,9rem) clamp(1.25rem,5vw,3.5rem) clamp(4rem,8vw,6rem);
+  min-height:100svh;padding-top:clamp(7rem,14vw,10rem);
+  padding-left:clamp(1.5rem,6vw,4.5rem);
+  padding-right:clamp(1.5rem,6vw,4.5rem);
+  padding-bottom:clamp(3rem,6vw,5rem);
+  display:grid;grid-template-columns:1fr;gap:0;
+  position:relative;overflow:hidden;
 }
-.hero-grid{
-  position:absolute;inset:0;
+
+/* faint noise grid */
+.hero::before{
+  content:'';position:absolute;inset:0;
   background-image:
-    linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+    linear-gradient(rgba(238,242,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(238,242,255,.025) 1px,transparent 1px);
   background-size:56px 56px;
-}
-.hero-scan{
-  position:absolute;left:0;right:0;height:1.5px;top:0;
-  background:linear-gradient(90deg,transparent 0%,var(--accent) 40%,var(--accent) 60%,transparent 100%);
-  opacity:.25;animation:scandown 7s linear infinite;
-}
-@keyframes scandown{0%{top:0;opacity:.25}50%{opacity:.5}100%{top:100%;opacity:.25}}
-.hero-glow{
-  position:absolute;top:15%;right:-5%;width:55vw;height:70vh;
-  background:radial-gradient(ellipse at 70% 30%,rgba(0,229,160,.045) 0%,transparent 65%);
   pointer-events:none;
 }
-.company-pill{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:5px 14px 5px 10px;
-  border:1px solid rgba(0,229,160,.25);border-radius:999px;
-  font-size:12px;color:var(--accent);background:rgba(0,229,160,.05);
-  margin-bottom:2.25rem;
+
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);font-weight:700;margin-bottom:2rem;
+  font-family:var(--mono);
 }
-.company-pill-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2.4s ease-in-out infinite}
+.hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--accent);flex-shrink:0}
+
+/* The hero headline — editorial: very large, left-aligned, line breaks intentional */
 .hero-h1{
-  font-size:clamp(2.4rem,5.8vw,5.2rem);
-  font-weight:800;line-height:1.04;letter-spacing:-.035em;
-  max-width:820px;margin-bottom:1.6rem;
+  font-size:clamp(3.2rem,8.5vw,9rem);
+  font-weight:900;
+  letter-spacing:-.055em;
+  line-height:.9;
+  max-width:16ch;
+  margin-bottom:2.5rem;
+  /* intentional: "Your" and "team" are on separate lines — this is editorial, not wrapping */
 }
-.hero-h1 em{font-style:normal;color:var(--accent)}
+.hero-h1 em{
+  font-style:normal;
+  /* outlined accent — editorial technique */
+  -webkit-text-stroke:2px var(--accent);
+  color:transparent;
+}
+
 .hero-sub{
-  font-size:clamp(.95rem,1.8vw,1.18rem);
-  color:var(--t2);max-width:560px;margin-bottom:2.75rem;line-height:1.72;
-}
-.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:clamp(2.5rem,5vw,4rem)}
-.hero-kpis{
-  display:flex;gap:clamp(1.5rem,4vw,3.5rem);flex-wrap:wrap;
-  padding-top:2rem;border-top:1px solid var(--border);
-}
-.kpi-val{
-  font-size:clamp(1.5rem,2.8vw,2.2rem);font-weight:800;
-  color:var(--accent);letter-spacing:-.03em;font-variant-numeric:tabular-nums;
-}
-.kpi-lbl{font-size:11.5px;color:var(--t3);margin-top:3px;line-height:1.4}
-
-/* Spine SVG */
-.spine{
-  position:absolute;right:clamp(1.5rem,7vw,9%);top:50%;transform:translateY(-50%);
-  width:clamp(100px,14vw,190px);opacity:.055;pointer-events:none;
+  font-size:clamp(1rem,2.2vw,1.3rem);
+  color:var(--t60);
+  max-width:48ch;
+  line-height:1.6;
+  margin-bottom:3rem;
 }
 
-/* ── PAIN STATS ── */
-.pain{padding:clamp(4rem,8vw,7rem) 0;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.pain-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:1px;background:var(--border);
-  border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:3rem;
+.hero-actions{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:16px 36px;border-radius:5px;
+  background:var(--accent);color:#04080F;
+  font-size:1rem;font-weight:800;
+  letter-spacing:.01em;cursor:pointer;border:none;
+  transition:opacity .15s,box-shadow .15s,transform .15s;
 }
-.pain-cell{background:var(--surface-2);padding:clamp(1.75rem,3vw,2.5rem) 2rem}
-.pain-num{
-  font-size:clamp(3rem,5.5vw,5rem);font-weight:800;
-  letter-spacing:-.045em;line-height:1;
-  font-variant-numeric:tabular-nums;margin-bottom:.75rem;
-}
-.pain-unit{font-size:.45em;color:var(--t2);font-weight:700;vertical-align:super;margin-right:2px}
-.pain-desc{font-size:13px;color:var(--t2);line-height:1.62}
-.pain-src{font-size:10px;color:var(--t3);margin-top:.5rem}
+.btn-primary:hover{opacity:.88;box-shadow:0 0 40px var(--a20);transform:translateY(-2px)}
+.btn-primary svg{transition:transform .2s}
+.btn-primary:hover svg{transform:translateX(3px)}
 
-/* ── HOW ── */
-.how{padding:clamp(4rem,8vw,7rem) 0}
-.sec-head{max-width:620px;margin-bottom:3.5rem}
-.sec-title{font-size:clamp(1.8rem,3.8vw,2.9rem);font-weight:800;letter-spacing:-.025em;line-height:1.12;margin:1rem 0 .75rem}
-.sec-sub{font-size:14.5px;color:var(--t2);line-height:1.7}
+.hero-proof{
+  font-size:.75rem;color:var(--t30);letter-spacing:.06em;font-family:var(--mono);
+  display:flex;align-items:center;gap:8px;
+}
+.hero-proof::before{content:'//';color:var(--accent);opacity:.5}
+
+/* Hero bottom: a full-width browser mockup */
+.hero-mockup{
+  margin-top:4rem;
+  border:1px solid var(--rule);
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 0 80px rgba(0,0,0,.6),0 0 0 1px var(--rule);
+  position:relative;
+  max-width:900px;
+}
+.mockup-bar{
+  background:var(--bg2);
+  padding:12px 16px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--rule);
+}
+.mb-dot{width:10px;height:10px;border-radius:50%}
+.mb-url{
+  flex:1;margin-left:4px;
+  background:var(--bg3);border-radius:4px;
+  padding:4px 10px;font-size:.72rem;font-family:var(--mono);color:var(--t30);
+}
+.mockup-body{
+  background:var(--bg2);
+  padding:2rem;
+  display:grid;grid-template-columns:1fr 180px;gap:1.5rem;
+  min-height:220px;
+}
+@media(max-width:600px){.mockup-body{grid-template-columns:1fr}}
+
+/* Skeleton score gauge in mockup */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.gauge-svg{width:140px;height:80px}
+.gauge-label{font-size:.65rem;font-family:var(--mono);color:var(--t30);letter-spacing:.08em;text-transform:uppercase}
+.gauge-score{font-size:2rem;font-weight:900;color:var(--accent);font-family:var(--mono);letter-spacing:-.04em}
+
+.mockup-stats{display:flex;flex-direction:column;gap:12px}
+.mstat{
+  background:var(--bg3);border:1px solid var(--rule);
+  border-radius:6px;padding:10px 14px;
+}
+.mstat-label{font-size:.62rem;color:var(--t30);letter-spacing:.08em;text-transform:uppercase;font-family:var(--mono)}
+.mstat-val{font-size:1.1rem;font-weight:800;letter-spacing:-.03em;margin-top:2px}
+.green{color:var(--accent)}
+.red{color:var(--red)}
+.amber{color:var(--amber)}
+
+/* live dot blink */
+.live-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-family:var(--mono);
+  color:var(--accent);background:var(--a10);
+  padding:3px 8px;border-radius:3px;
+}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:blink 1.2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ══ TICKER ══ */
+.ticker{
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  background:var(--bg2);
+  overflow:hidden;padding:0;
+  height:48px;display:flex;align-items:center;
+}
+.ticker-inner{display:flex;width:max-content;animation:tick 45s linear infinite}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{
+  display:flex;align-items:center;gap:1rem;
+  padding:0 2.5rem;font-size:.72rem;font-family:var(--mono);
+  color:var(--t30);letter-spacing:.08em;white-space:nowrap;
+}
+.ticker-item b{color:var(--text)}
+.ticker-sep{color:var(--rule);flex-shrink:0}
+
+/* ══ IMPACT ══ */
+.impact{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;border-bottom:1px solid var(--rule);
+}
+@media(max-width:800px){.impact{grid-template-columns:1fr}}
+
+.impact-l{
+  padding:clamp(3.5rem,7vw,6rem) clamp(1.5rem,5vw,4rem);
+  border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;justify-content:center;
+}
+@media(max-width:800px){.impact-l{border-right:none;border-bottom:1px solid var(--rule)}}
+
+.impact-label{
+  font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--t30);font-family:var(--mono);margin-bottom:1.5rem;
+}
+.big-number{
+  font-size:clamp(6rem,15vw,15rem);
+  font-weight:900;letter-spacing:-.07em;line-height:.85;
+  -webkit-text-stroke:2.5px var(--accent);
+  color:transparent;
+  display:block;margin-bottom:1rem;
+}
+.big-unit{
+  font-size:clamp(1rem,2.5vw,1.4rem);color:var(--t60);
+  line-height:1.4;max-width:32ch;
+}
+.big-unit b{color:var(--text)}
+
+.impact-r{
+  padding:clamp(3.5rem,7vw,6rem) clamp(1.5rem,5vw,4rem);
+  display:flex;flex-direction:column;gap:clamp(1.5rem,3vw,2.5rem);justify-content:center;
+}
+.istat{padding-bottom:clamp(1.5rem,3vw,2.5rem);border-bottom:1px solid var(--rule)}
+.istat:last-child{border-bottom:none;padding-bottom:0}
+.istat-n{
+  font-size:clamp(2.5rem,5.5vw,5rem);font-weight:900;letter-spacing:-.05em;
+  font-family:var(--mono);line-height:1;margin-bottom:.3rem;
+}
+.istat-d{font-size:.9rem;color:var(--t60);line-height:1.45}
+
+/* ══ HOW ══ */
+.how-header{
+  padding:clamp(3rem,6vw,5rem) clamp(1.5rem,6vw,4.5rem) 0;
+}
+.section-label{
+  font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--t30);font-family:var(--mono);margin-bottom:1rem;
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::before{content:'';width:20px;height:1px;background:var(--t30)}
+.section-h2{
+  font-size:clamp(2rem,5vw,4rem);font-weight:900;letter-spacing:-.045em;
+  line-height:.95;max-width:20ch;
+}
+
 .steps{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:0;border-top:1px solid var(--rule);margin-top:3rem;
 }
-.step{background:var(--surface);padding:clamp(2rem,3vw,2.5rem) 2rem;position:relative}
-.step::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--accent),transparent);
-  opacity:0;transition:opacity .25s;
+@media(max-width:700px){.steps{grid-template-columns:1fr}}
+.step{
+  padding:clamp(2rem,4vw,3rem) clamp(1.5rem,4vw,3rem);
+  border-right:1px solid var(--rule);
+  position:relative;
 }
-.step:hover::before{opacity:1}
+.step:last-child{border-right:none}
+@media(max-width:700px){.step{border-right:none;border-bottom:1px solid var(--rule)}}
 .step-n{
-  font-size:58px;font-weight:900;letter-spacing:-.06em;line-height:1;
-  color:rgba(0,229,160,.09);margin-bottom:1.25rem;font-variant-numeric:tabular-nums;
+  font-size:clamp(4rem,9vw,8rem);font-weight:900;letter-spacing:-.06em;
+  color:var(--rule);line-height:1;margin-bottom:1.5rem;font-family:var(--mono);
+  position:relative;
 }
-.step-title{font-size:16px;font-weight:700;margin-bottom:.6rem}
-.step-desc{font-size:13px;color:var(--t2);line-height:1.65}
-.step-chip{
-  display:inline-block;margin-top:1rem;font-size:10px;font-weight:700;
-  letter-spacing:.09em;text-transform:uppercase;
-  color:var(--accent);background:var(--accent-dim);padding:3px 10px;border-radius:99px;
+.step-n::after{
+  content:attr(data-n);position:absolute;inset:0;
+  color:var(--t10);
 }
+.step-icon{
+  width:36px;height:36px;margin-bottom:1.2rem;
+  color:var(--accent);flex-shrink:0;
+}
+.step h3{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.6rem}
+.step p{font-size:.88rem;color:var(--t60);line-height:1.55}
+.step-tag{
+  display:inline-block;margin-top:1rem;
+  font-size:.65rem;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 8px;border-radius:3px;font-weight:700;
+}
+.tag-green{background:var(--a10);color:var(--accent)}
+.tag-amber{background:var(--m10);color:var(--amber)}
+.tag-red{background:var(--r10);color:var(--red)}
 
-/* ── DEMO ── */
-.demo{padding:clamp(3rem,6vw,6rem) 0;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.demo-inner{display:grid;grid-template-columns:1fr 1.55fr;gap:clamp(2rem,4vw,4rem);align-items:center}
-@media(max-width:780px){.demo-inner{grid-template-columns:1fr}}
-.demo-copy .sec-title{font-size:clamp(1.5rem,3vw,2.2rem)}
-.tech-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:1.25rem}
-.tech-chip{
-  font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
-  color:var(--accent);background:var(--accent-dim);padding:4px 11px;border-radius:99px;
-  border:1px solid rgba(0,229,160,.15);
+/* ══ ROI ══ */
+.roi{background:var(--bg2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.roi-inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:0;
 }
-.browser{
-  background:var(--bg);border:1px solid var(--border-s);
-  border-radius:12px;overflow:hidden;
-  box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
-}
-.browser-bar{
-  display:flex;align-items:center;gap:6px;
-  padding:9px 13px;background:var(--surface-2);border-bottom:1px solid var(--border);
-}
-.bdot{width:11px;height:11px;border-radius:50%}
-.burl{
-  flex:1;font-size:10px;font-family:monospace;color:var(--t3);
-  background:var(--bg);border-radius:5px;padding:4px 9px;margin-left:9px;
-  border:1px solid var(--border);
-}
-.browser-body{height:360px;position:relative;overflow:hidden;background:var(--surface-2)}
-.faux-ui{width:100%;height:100%;display:flex;flex-direction:column;padding:16px;gap:10px}
-.faux-nav{height:36px;background:var(--surface);border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:8px}
-.faux-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
-.faux-nav-title{font-size:11px;font-weight:700;color:var(--text)}
-.faux-nav-badge{margin-left:auto;font-size:9px;background:var(--accent-dim);color:var(--accent);padding:2px 7px;border-radius:99px;border:1px solid rgba(0,229,160,.2)}
-.faux-row{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;flex-shrink:0}
-.faux-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
-.faux-card-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
-.faux-card-val{font-size:20px;font-weight:800;letter-spacing:-.03em;color:var(--accent)}
-.faux-main{flex:1;background:var(--surface);border-radius:8px;border:1px solid var(--border);overflow:hidden;position:relative}
-.faux-main-top{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.faux-main-title{font-size:10px;font-weight:600;color:var(--t2)}
-.faux-status{display:flex;align-items:center;gap:5px;margin-left:auto}
-.faux-status-dot{width:6px;height:6px;border-radius:50%;background:#00E5A0;animation:pulse 2s infinite}
-.faux-status-txt{font-size:9px;color:var(--accent)}
-.faux-video{
-  width:100%;height:100%;
-  background:linear-gradient(135deg,#0a1520 0%,#0d1f30 50%,#0a1520 100%);
-  display:flex;align-items:center;justify-content:center;position:relative;
-}
-.faux-skeleton{width:70px;height:130px;position:relative}
-.faux-skeleton svg{width:100%;height:100%;opacity:.35}
-.faux-overlay{
-  position:absolute;top:8px;left:8px;right:8px;
-  background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.25);
-  border-radius:6px;padding:5px 8px;
-  font-size:9px;color:var(--accent);
-}
-.faux-scanbar{
-  position:absolute;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--accent),transparent);
-  opacity:.5;animation:scandown 3.5s linear infinite;
-}
-.browser-overlay{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
-  background:rgba(6,11,18,.88);backdrop-filter:blur(6px);
-  cursor:pointer;transition:background .2s;
-}
-.browser-overlay:hover{background:rgba(6,11,18,.75)}
-.play-ring{
-  width:62px;height:62px;border-radius:50%;
-  background:var(--accent);display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 0 12px rgba(0,229,160,.12),0 0 0 24px rgba(0,229,160,.05);
-  transition:transform .2s,box-shadow .2s;
-}
-.browser-overlay:hover .play-ring{transform:scale(1.08);box-shadow:0 0 0 16px rgba(0,229,160,.15),0 0 0 30px rgba(0,229,160,.07)}
-.play-lbl{font-size:12.5px;font-weight:500;color:var(--t2)}
+@media(max-width:800px){.roi-inner{grid-template-columns:1fr}}
 
-/* ── ROI ── */
-.roi-sec{padding:clamp(4rem,8vw,7rem) 0}
-.roi-box{background:var(--surface);border:1px solid var(--border-s);border-radius:18px;overflow:hidden;margin-top:3rem}
-.roi-slider-wrap{padding:2rem 2.5rem;border-bottom:1px solid var(--border)}
-.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.1rem}
-.slider-lbl{font-size:13px;color:var(--t2)}
-.slider-val{font-size:26px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.roi-l{
+  padding:clamp(3.5rem,7vw,6rem) clamp(1.5rem,5vw,4rem);
+  border-right:1px solid var(--rule);
+}
+@media(max-width:800px){.roi-l{border-right:none;border-bottom:1px solid var(--rule)}}
+
+.roi-slider-wrap{margin-top:2rem}
+.roi-slider-label{
+  font-size:.72rem;font-family:var(--mono);color:var(--t30);
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem;
+}
 input[type=range]{
-  -webkit-appearance:none;width:100%;height:5px;
-  border-radius:99px;background:var(--border-s);outline:none;cursor:pointer;
+  width:100%;-webkit-appearance:none;appearance:none;
+  height:2px;background:var(--rule);border-radius:0;outline:none;cursor:pointer;
 }
 input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
-  background:var(--accent);box-shadow:0 0 14px var(--accent-glow);cursor:grab;
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 16px var(--a20);cursor:pointer;
 }
-input[type=range]::-webkit-slider-thumb:active{cursor:grabbing}
-.slider-ends{display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;color:var(--t3)}
-.roi-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
-@media(max-width:580px){.roi-cards{grid-template-columns:1fr}}
-.roi-card{background:var(--surface-2);padding:2rem 1.75rem}
-.roi-card.hi{background:rgba(0,229,160,.06)}
-.roi-clbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:.85rem}
-.roi-card.hi .roi-clbl{color:rgba(0,229,160,.6)}
-.roi-amt{font-size:clamp(1.6rem,2.8vw,2.2rem);font-weight:900;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
-.roi-card.hi .roi-amt{color:var(--accent)}
-.roi-note{font-size:11.5px;color:var(--t3);margin-top:.5rem;line-height:1.55}
-.roi-footer{
-  padding:1.4rem 2.5rem;display:flex;align-items:center;
-  justify-content:space-between;flex-wrap:wrap;gap:.75rem;
+.roi-team-val{
+  font-size:clamp(3rem,7vw,6rem);font-weight:900;letter-spacing:-.05em;
+  font-family:var(--mono);color:var(--text);line-height:1;margin-bottom:.25rem;
 }
-.roi-multiplier{font-size:14px;color:var(--t2)}
-.roi-multiplier strong{color:var(--accent);font-size:20px;font-weight:800}
-.roi-src{font-size:10.5px;color:var(--t3);line-height:1.6}
+.roi-team-sub{font-size:.8rem;color:var(--t30);font-family:var(--mono);letter-spacing:.06em}
 
-/* ── CRED ── */
-.cred{padding:clamp(3.5rem,7vw,6rem) 0;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.cred-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-  gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:3rem;
+.roi-r{
+  padding:clamp(3.5rem,7vw,6rem) clamp(1.5rem,5vw,4rem);
+  display:flex;flex-direction:column;gap:2rem;
 }
-.cred-cell{background:var(--surface-2);padding:2rem 1.75rem}
-.cred-icon{font-size:22px;margin-bottom:1rem}
-.cred-title{font-size:14.5px;font-weight:700;margin-bottom:.45rem}
-.cred-desc{font-size:12.5px;color:var(--t2);line-height:1.62}
+.roi-metric{border-bottom:1px solid var(--rule);padding-bottom:2rem}
+.roi-metric:last-child{border-bottom:none;padding-bottom:0}
+.roi-metric-label{font-size:.68rem;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--t30);margin-bottom:.5rem}
+.roi-metric-val{font-size:clamp(2rem,4.5vw,3.5rem);font-weight:900;letter-spacing:-.04em;font-family:var(--mono)}
+.roi-metric-val.accent{color:var(--accent)}
+.roi-note{font-size:.75rem;color:var(--t30);font-family:var(--mono);margin-top:.25rem}
 
-/* ── CTA ── */
-.cta-sec{
-  padding:clamp(5rem,10vw,10rem) 0;
-  text-align:center;position:relative;overflow:hidden;
+/* ══ TRUST ══ */
+.trust{padding:clamp(4rem,8vw,6rem) clamp(1.5rem,6vw,4.5rem)}
+.trust-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:0;border:1px solid var(--rule);margin-top:3rem;
 }
-.cta-halo{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:700px;height:500px;
-  background:radial-gradient(ellipse,rgba(0,229,160,.055) 0%,transparent 68%);
+@media(max-width:700px){.trust-grid{grid-template-columns:1fr}}
+.trust-item{
+  padding:2rem 2rem;border-right:1px solid var(--rule);
+}
+.trust-item:last-child{border-right:none}
+@media(max-width:700px){.trust-item{border-right:none;border-bottom:1px solid var(--rule)}}
+.trust-icon{margin-bottom:1.2rem;color:var(--t60)}
+.trust-item h3{font-size:.95rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem}
+.trust-item p{font-size:.82rem;color:var(--t60);line-height:1.55}
+
+/* ══ CTA ══ */
+.cta-section{
+  text-align:center;
+  padding:clamp(5rem,10vw,9rem) clamp(1.5rem,6vw,4.5rem);
+  position:relative;overflow:hidden;
+}
+.cta-section::before{
+  content:'';position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,229,160,.04),transparent 70%);
   pointer-events:none;
 }
+.cta-label{
+  font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+  font-family:var(--mono);color:var(--t30);margin-bottom:1.5rem;
+}
 .cta-h2{
-  font-size:clamp(2rem,5vw,4rem);font-weight:900;
-  letter-spacing:-.04em;line-height:1.06;
-  max-width:680px;margin:0 auto 1.4rem;
+  font-size:clamp(2.5rem,7vw,7rem);font-weight:900;letter-spacing:-.05em;
+  line-height:.92;max-width:16ch;margin:0 auto 1.5rem;
 }
-.cta-h2 span{color:var(--accent)}
-.cta-sub{font-size:15px;color:var(--t2);max-width:460px;margin:0 auto 2.5rem;line-height:1.7}
-.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta-h2 span{
+  -webkit-text-stroke:2px var(--accent);color:transparent;
+}
+.cta-sub{font-size:1.05rem;color:var(--t60);max-width:38ch;margin:0 auto 3rem;line-height:1.6}
+.cta-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:20px 48px;border-radius:5px;
+  background:var(--accent);color:#04080F;
+  font-size:1.05rem;font-weight:900;letter-spacing:.01em;
+  cursor:pointer;border:none;
+  transition:opacity .15s,box-shadow .2s,transform .15s;
+  text-decoration:none;
+}
+.cta-btn:hover{opacity:.88;box-shadow:0 0 60px var(--a20);transform:translateY(-2px)}
+.cta-btn svg{transition:transform .2s}
+.cta-btn:hover svg{transform:translateX(4px)}
+.cta-legal{font-size:.68rem;color:var(--t30);font-family:var(--mono);letter-spacing:.06em;margin-top:1.5rem}
 
-/* ── FOOTER ── */
+/* ══ FOOTER ══ */
 footer{
-  padding:1.4rem clamp(1.25rem,5vw,3.5rem);
-  border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;
+  border-top:1px solid var(--rule);
+  padding:1.5rem clamp(1.5rem,5vw,4rem);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
 }
-footer p{font-size:11.5px;color:var(--t3)}
-footer a{color:var(--accent);text-decoration:none;font-size:11.5px;font-weight:500}
-footer a:hover{text-decoration:underline}
+.footer-logo{font-weight:800;font-size:.85rem;letter-spacing:-.01em;display:flex;align-items:center;gap:6px}
+.footer-r{font-size:.72rem;font-family:var(--mono);color:var(--t30);letter-spacing:.05em}
+
+/* ── RESPONSIVE TWEAKS ── */
+@media(max-width:500px){
+  .hero-actions{flex-direction:column;align-items:flex-start}
+  .btn-primary{width:100%;justify-content:center}
+}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
+<!-- ─────────────── NAV ─────────────── -->
 <nav>
-  <div class="nav-logo">
-    <span class="pulse"></span>
+  <div class="logo">
+    <div class="pulse"></div>
     PosturePro
   </div>
-  <div class="nav-r">
-    <a href="https://posture-pro-gamma.vercel.app/" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:12.5px;padding:8px 18px">Live App ↗</a>
-    <a href="#roi" class="btn btn-accent" style="font-size:12.5px;padding:8px 18px">Calculate ROI</a>
-  </div>
+  <a href="https://posture-pro-gamma.vercel.app/" class="nav-cta">
+    Open App
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
 </nav>
 
-<!-- HERO -->
+<!-- ─────────────── HERO ─────────────── -->
 <section class="hero">
-  <div class="hero-grid"></div>
-  <div class="hero-scan"></div>
-  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">AI-Powered Posture Intelligence</div>
 
-  <svg class="spine" viewBox="0 0 120 620" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <g stroke="white" stroke-width="1.5" stroke-linecap="round">
-      <rect x="30" y="18" width="60" height="28" rx="7"/>
-      <rect x="30" y="60" width="60" height="28" rx="7"/>
-      <rect x="30" y="102" width="60" height="28" rx="7"/>
-      <rect x="30" y="144" width="60" height="28" rx="7"/>
-      <rect x="30" y="186" width="60" height="28" rx="7"/>
-      <rect x="28" y="230" width="64" height="30" rx="7"/>
-      <rect x="26" y="276" width="68" height="32" rx="7"/>
-      <rect x="24" y="325" width="72" height="34" rx="7"/>
-      <rect x="22" y="376" width="76" height="36" rx="7"/>
-      <rect x="20" y="429" width="80" height="38" rx="7"/>
-      <rect x="18" y="484" width="84" height="40" rx="7"/>
-      <rect x="16" y="542" width="88" height="42" rx="7"/>
-      <line x1="60" y1="46" x2="60" y2="60"/><line x1="60" y1="88" x2="60" y2="102"/>
-      <line x1="60" y1="130" x2="60" y2="144"/><line x1="60" y1="172" x2="60" y2="186"/>
-      <line x1="60" y1="214" x2="60" y2="230"/><line x1="60" y1="260" x2="60" y2="276"/>
-      <line x1="60" y1="308" x2="60" y2="325"/><line x1="60" y1="359" x2="60" y2="376"/>
-      <line x1="60" y1="412" x2="60" y2="429"/><line x1="60" y1="467" x2="60" y2="484"/>
-      <line x1="60" y1="524" x2="60" y2="542"/>
-    </g>
-  </svg>
+  <h1 class="hero-h1 up">
+    Your team<br>is <em>losing</em><br>money daily.
+  </h1>
 
-  <div style="position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 clamp(1.25rem,5vw,3.5rem);width:100%">
-    <div class="company-pill">
-      <span class="company-pill-dot"></span>
-      Prepared for <strong id="companyName" style="margin-left:3px">Your Team</strong>
-    </div>
-    <h1 class="hero-h1">
-      Your team is silently losing<br>
-      <em id="heroLoss">millions per year</em><br>
-      to poor posture
-    </h1>
-    <p class="hero-sub">PosturePro catches it in real-time — AI-powered posture detection that alerts employees before bad habits become injury claims, sick days, and rising health premiums.</p>
-    <div class="hero-ctas">
-      <a href="#roi" class="btn btn-accent" style="font-size:15px;padding:13px 30px">Calculate My Team's ROI →</a>
-      <a href="https://posture-pro-gamma.vercel.app/" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:15px;padding:13px 30px">Try the Live Product ↗</a>
-    </div>
-    <div class="hero-kpis">
-      <div><div class="kpi-val">5×</div><div class="kpi-lbl">posture checks<br>per second</div></div>
-      <div><div class="kpi-val">0</div><div class="kpi-lbl">video stored —<br>privacy-first</div></div>
-      <div><div class="kpi-val">6×</div><div class="kpi-lbl">average ROI on<br>ergonomics programs</div></div>
-      <div><div class="kpi-val">80%</div><div class="kpi-lbl">office workers with<br>posture-related pain</div></div>
-    </div>
+  <p class="hero-sub up" style="transition-delay:.12s">
+    Musculoskeletal disorders cost employers $20,000 per affected worker, per year — silently. PosturePro detects bad posture in real time before it becomes a claim.
+  </p>
+
+  <div class="hero-actions up" style="transition-delay:.22s">
+    <a href="https://posture-pro-gamma.vercel.app/" class="btn-primary">
+      See it live
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="hero-proof">No install &middot; Works in browser &middot; Real-time AI</div>
   </div>
-</section>
 
-<!-- PAIN STATS -->
-<section class="pain fade-up">
-  <div class="container">
-    <div class="eyebrow">The scale of the problem</div>
-    <div class="sec-title" style="font-size:clamp(1.5rem,3vw,2rem);margin:.75rem 0 0;max-width:580px">Numbers your HR director already knows — but hasn't solved</div>
-    <div class="pain-grid">
-      <div class="pain-cell">
-        <div class="pain-num"><span class="counter" data-target="80">0</span><span class="pain-unit">%</span></div>
-        <div class="pain-desc">of office workers experience back or neck pain directly linked to poor workplace posture</div>
-        <div class="pain-src">Source: World Health Organization</div>
-      </div>
-      <div class="pain-cell">
-        <div class="pain-num"><span class="pain-unit" style="vertical-align:baseline;font-size:.42em;margin-right:1px">$</span><span class="counter" data-target="20">0</span><span class="pain-unit">K</span></div>
-        <div class="pain-desc">average annual cost per affected employee — lost productivity, medical claims, turnover</div>
-        <div class="pain-src">Source: RAND Corporation</div>
-      </div>
-      <div class="pain-cell">
-        <div class="pain-num"><span class="counter" data-target="63">0</span><span class="pain-unit">%</span></div>
-        <div class="pain-desc">of employees never report posture discomfort until it becomes an acute, costly injury</div>
-        <div class="pain-src">Source: Bureau of Labor Statistics</div>
-      </div>
-      <div class="pain-cell">
-        <div class="pain-num"><span class="counter" data-target="8">0</span><span class="pain-unit">mo</span></div>
-        <div class="pain-desc">average time before employees seek treatment — months of compounding silent damage</div>
-        <div class="pain-src">Source: American Chiropractic Association</div>
-      </div>
+  <!-- Browser mockup -->
+  <div class="hero-mockup up" style="transition-delay:.34s">
+    <div class="mockup-bar">
+      <div class="mb-dot" style="background:#FF5F57"></div>
+      <div class="mb-dot" style="background:#FEBC2E"></div>
+      <div class="mb-dot" style="background:#28C840"></div>
+      <div class="mb-url">posture-pro-gamma.vercel.app</div>
+      <div class="live-chip"><div class="live-dot"></div>LIVE</div>
     </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="how fade-up">
-  <div class="container">
-    <div class="sec-head">
-      <div class="eyebrow">How it works</div>
-      <div class="sec-title">From webcam to wellness report in 30 seconds</div>
-      <div class="sec-sub">No hardware. No wearables. No IT requests. Works on any laptop with a webcam — which is every remote and hybrid employee on your team.</div>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-n">01</div>
-        <div class="step-title">Real-time AI posture detection</div>
-        <div class="step-desc">Google MediaPipe's 33-point pose model tracks body position 5 times per second via the webcam. Detects forward head, slouching, uneven shoulders, head drop, and shoulder hunch.</div>
-        <span class="step-chip">No data stored</span>
-      </div>
-      <div class="step">
-        <div class="step-n">02</div>
-        <div class="step-title">Instant alerts + AI exercises</div>
-        <div class="step-desc">Employees get in-the-moment posture alerts, then Gemini AI generates a personalized exercise plan targeting their exact detected issues — not a generic PDF, real tailored guidance.</div>
-        <span class="step-chip">Gemini 1.5 Flash</span>
-      </div>
-      <div class="step">
-        <div class="step-n">03</div>
-        <div class="step-title">Progress dashboard + HR insights</div>
-        <div class="step-desc">Every session logs a posture score. Employees see their trend improving. HR gets team-level aggregated insights to identify which departments or roles have the highest risk.</div>
-        <span class="step-chip">Team analytics</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- LIVE DEMO -->
-<section class="demo fade-up">
-  <div class="container">
-    <div class="demo-inner">
-      <div class="demo-copy">
-        <div class="eyebrow">Live product</div>
-        <div class="sec-title" style="font-size:clamp(1.5rem,3vw,2.3rem)">This isn't a mockup. It's working software — open it right now.</div>
-        <div class="sec-sub" style="font-size:13.5px;margin:1rem 0 1.75rem">Deployed on Vercel, backed by Supabase, powered by Google AI. No sign-up needed to try the core posture analysis feature.</div>
-        <a href="https://posture-pro-gamma.vercel.app/" target="_blank" rel="noopener" class="btn btn-accent" style="font-size:14px;padding:12px 26px;margin-bottom:2rem">Open Live Demo ↗</a>
-        <div>
-          <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.75rem">Built with</div>
-          <div class="tech-chips">
-            <span class="tech-chip">Next.js 15</span>
-            <span class="tech-chip">MediaPipe</span>
-            <span class="tech-chip">Gemini AI</span>
-            <span class="tech-chip">Supabase</span>
-            <span class="tech-chip">FastAPI</span>
-            <span class="tech-chip">Vercel</span>
-          </div>
+    <div class="mockup-body">
+      <div class="mockup-stats">
+        <div class="mstat">
+          <div class="mstat-label">Session Score</div>
+          <div class="mstat-val green">87 / 100</div>
+        </div>
+        <div class="mstat">
+          <div class="mstat-label">Head Forward</div>
+          <div class="mstat-val amber">Detected — 12 min</div>
+        </div>
+        <div class="mstat">
+          <div class="mstat-label">Shoulder Tilt</div>
+          <div class="mstat-val red">Critical — Fix now</div>
+        </div>
+        <div class="mstat">
+          <div class="mstat-label">Good Posture</div>
+          <div class="mstat-val green">73% of session</div>
         </div>
       </div>
-      <div class="browser">
-        <div class="browser-bar">
-          <span class="bdot" style="background:#FF5F57"></span>
-          <span class="bdot" style="background:#FEBC2E"></span>
-          <span class="bdot" style="background:#28C840"></span>
-          <div class="burl">posture-pro-gamma.vercel.app</div>
-        </div>
-        <div class="browser-body">
-          <div class="faux-ui">
-            <div class="faux-nav">
-              <span class="faux-nav-dot"></span>
-              <span class="faux-nav-title">PosturePro</span>
-              <span class="faux-nav-badge">Live Session</span>
-            </div>
-            <div class="faux-row">
-              <div class="faux-card"><div class="faux-card-lbl">Posture Score</div><div class="faux-card-val" id="faux-score">78%</div></div>
-              <div class="faux-card"><div class="faux-card-lbl">Issues Found</div><div class="faux-card-val" style="color:#FFB84A">2</div></div>
-              <div class="faux-card"><div class="faux-card-lbl">Session</div><div class="faux-card-val" id="faux-time" style="color:var(--t2);font-size:16px">0:32</div></div>
-            </div>
-            <div class="faux-main">
-              <div class="faux-main-top">
-                <span class="faux-main-title">Webcam Analysis</span>
-                <div class="faux-status"><span class="faux-status-dot"></span><span class="faux-status-txt">Analyzing...</span></div>
-              </div>
-              <div class="faux-video">
-                <div class="faux-scanbar"></div>
-                <div class="faux-skeleton">
-                  <svg viewBox="0 0 70 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="35" cy="12" r="10" stroke="#00E5A0" stroke-width="1.5"/>
-                    <line x1="35" y1="22" x2="35" y2="70" stroke="#00E5A0" stroke-width="1.5"/>
-                    <line x1="35" y1="38" x2="14" y2="58" stroke="#00E5A0" stroke-width="1.5"/>
-                    <line x1="35" y1="38" x2="56" y2="58" stroke="#00E5A0" stroke-width="1.5"/>
-                    <line x1="35" y1="70" x2="20" y2="110" stroke="#00E5A0" stroke-width="1.5"/>
-                    <line x1="35" y1="70" x2="50" y2="110" stroke="#00E5A0" stroke-width="1.5"/>
-                  </svg>
-                </div>
-                <div class="faux-overlay">⚠ Forward head posture detected</div>
-              </div>
-            </div>
-          </div>
-          <div class="browser-overlay" onclick="window.open('https://posture-pro-gamma.vercel.app/','_blank')" role="button" tabindex="0" aria-label="Open PosturePro live demo" onkeydown="if(event.key==='Enter')this.click()">
-            <div class="play-ring">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="#060B12"><polygon points="5,3 19,12 5,21"/></svg>
-            </div>
-            <div class="play-lbl">Open live demo in new tab</div>
-          </div>
-        </div>
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" viewBox="0 0 140 80">
+          <defs>
+            <linearGradient id="ggrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#FF3347"/>
+              <stop offset="55%" stop-color="#FFAA00"/>
+              <stop offset="100%" stop-color="#00E5A0"/>
+            </linearGradient>
+          </defs>
+          <!-- track -->
+          <path d="M14 74 A56 56 0 0 1 126 74" stroke="rgba(238,242,255,.08)" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <!-- fill (87%) -->
+          <path d="M14 74 A56 56 0 0 1 126 74" stroke="url(#ggrad)" stroke-width="8" fill="none" stroke-linecap="round"
+            stroke-dasharray="176" stroke-dashoffset="23"/>
+          <!-- needle -->
+          <line x1="70" y1="74" x2="103" y2="22" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+          <circle cx="70" cy="74" r="4" fill="white" opacity=".6"/>
+        </svg>
+        <div class="gauge-score">87</div>
+        <div class="gauge-label">Posture Score</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ROI CALCULATOR -->
-<section class="roi-sec fade-up" id="roi">
-  <div class="container">
-    <div class="sec-head">
-      <div class="eyebrow">ROI Calculator</div>
-      <div class="sec-title">How much is poor posture costing <span id="roiCompanyName">your team</span>?</div>
-      <div class="sec-sub">Drag the slider. Your exact numbers appear instantly.</div>
+<!-- ─────────────── TICKER ─────────────── -->
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    <!-- items injected twice for seamless loop -->
+  </div>
+</div>
+
+<!-- ─────────────── IMPACT ─────────────── -->
+<div class="impact">
+  <div class="impact-l up">
+    <div class="impact-label">// The cost of inaction</div>
+    <span class="big-number">$20K</span>
+    <p class="big-unit">
+      Average employer cost per MSK-affected worker, per year.<br>
+      <b>20% of desk teams are affected right now.</b>
+    </p>
+  </div>
+  <div class="impact-r">
+    <div class="istat up">
+      <div class="istat-n red">$650B</div>
+      <div class="istat-d">Annual US productivity loss<br>from musculoskeletal disorders</div>
     </div>
-    <div class="roi-box">
+    <div class="istat up" style="transition-delay:.1s">
+      <div class="istat-n amber">67%</div>
+      <div class="istat-d">of remote workers report<br>worsening back pain since 2020</div>
+    </div>
+    <div class="istat up" style="transition-delay:.2s">
+      <div class="istat-n" style="color:var(--accent)">30%</div>
+      <div class="istat-d">injury-cost reduction with<br>early posture intervention</div>
+    </div>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- ─────────────── HOW IT WORKS ─────────────── -->
+<div class="how-header up">
+  <div class="section-label">How PosturePro works</div>
+  <h2 class="section-h2">Three steps from camera to clarity.</h2>
+</div>
+
+<div class="steps">
+  <div class="step up">
+    <div class="step-n" data-n="01">01</div>
+    <svg class="step-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="13" r="5"/><path d="M6 30c0-6.627 5.373-12 12-12s12 5.373 12 12"/>
+      <circle cx="18" cy="13" r="5"/>
+    </svg>
+    <h3>Camera On — Analysis Starts</h3>
+    <p>Employee opens the web app. The browser's camera activates. No download, no setup. MediaPipe skeleton tracking begins in under two seconds.</p>
+    <span class="step-tag tag-green">Works in any browser</span>
+  </div>
+  <div class="step up" style="transition-delay:.1s">
+    <div class="step-n" data-n="02">02</div>
+    <svg class="step-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 6v6M18 24v6M6 18h6M24 18h6"/><circle cx="18" cy="18" r="5"/>
+      <path d="M10.1 10.1l4.24 4.24M21.66 21.66l4.24 4.24M10.1 25.9l4.24-4.24M21.66 14.34l4.24-4.24"/>
+    </svg>
+    <h3>AI Detects Issues in Real Time</h3>
+    <p>Forward head posture, shoulder tilt, and spine deviation are flagged live. Alerts appear the moment a risky posture is held for more than 15 seconds.</p>
+    <span class="step-tag tag-amber">On-device — no data leaves</span>
+  </div>
+  <div class="step up" style="transition-delay:.2s">
+    <div class="step-n" data-n="03">03</div>
+    <svg class="step-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6" y="8" width="24" height="20" rx="2"/>
+      <path d="M12 20l4 4 8-8"/>
+    </svg>
+    <h3>Scores, Reports, Trends</h3>
+    <p>Each session generates a posture score. HR and wellness managers see anonymized aggregate risk across the team — no invasive individual data.</p>
+    <span class="step-tag tag-green">GDPR-friendly design</span>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- ─────────────── ROI CALCULATOR ─────────────── -->
+<div class="roi">
+  <div class="roi-inner">
+    <div class="roi-l up">
+      <div class="section-label">ROI Calculator</div>
+      <h2 class="section-h2" style="font-size:clamp(1.8rem,4vw,3.2rem)">How much does your team risk losing?</h2>
+
       <div class="roi-slider-wrap">
-        <div class="slider-row">
-          <span class="slider-lbl">Team size</span>
-          <span class="slider-val"><span id="sliderDisplay">150</span> employees</span>
-        </div>
-        <input type="range" min="10" max="2000" value="150" step="10" id="teamSlider" aria-label="Team size slider">
-        <div class="slider-ends"><span>10</span><span>2,000+</span></div>
+        <div class="roi-slider-label">Team size</div>
+        <div class="roi-team-val mono" id="teamVal">200</div>
+        <div class="roi-team-sub">employees</div>
+        <input type="range" min="10" max="2000" value="200" step="10" id="teamSlider" oninput="updateROI(this.value)">
       </div>
-      <div class="roi-cards">
-        <div class="roi-card">
-          <div class="roi-clbl">Annual cost of inaction</div>
-          <div class="roi-amt" id="costInaction">$600,000</div>
-          <div class="roi-note" id="costNote">30 employees affected × $20K average cost</div>
-        </div>
-        <div class="roi-card">
-          <div class="roi-clbl">PosturePro annual cost</div>
-          <div class="roi-amt" id="ppCost">$21,600</div>
-          <div class="roi-note">$12/user/month · enterprise pricing available</div>
-        </div>
-        <div class="roi-card hi">
-          <div class="roi-clbl">Your annual net savings</div>
-          <div class="roi-amt" id="netSavings">$158,400</div>
-          <div class="roi-note">30% of posture costs prevented by early AI intervention</div>
-        </div>
+    </div>
+
+    <div class="roi-r">
+      <div class="roi-metric up">
+        <div class="roi-metric-label">Employees at risk (20%)</div>
+        <div class="roi-metric-val mono" id="atRisk">40</div>
+        <div class="roi-note">estimated with MSK conditions</div>
       </div>
-      <div class="roi-footer">
-        <div class="roi-multiplier">That's a <strong id="roiMult">7.3×</strong> return — you save $7.33 for every $1 spent on PosturePro</div>
-        <div class="roi-src">Sources: RAND Corporation · American Journal of Health Promotion · WHO Global Report</div>
+      <div class="roi-metric up" style="transition-delay:.1s">
+        <div class="roi-metric-label">Cost of inaction / year</div>
+        <div class="roi-metric-val mono red" id="inactionCost">$800,000</div>
+        <div class="roi-note">at $20K per affected worker</div>
+      </div>
+      <div class="roi-metric up" style="transition-delay:.2s">
+        <div class="roi-metric-label">Net savings with PosturePro</div>
+        <div class="roi-metric-val mono accent" id="netSav">$192,000</div>
+        <div class="roi-note" id="roiNote">after PosturePro cost — <span id="roiX">3.5</span>× ROI</div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- CREDIBILITY -->
-<section class="cred fade-up">
-  <div class="container">
-    <div class="eyebrow">Why this is credible</div>
-    <div class="sec-title" style="font-size:clamp(1.5rem,3vw,2rem);margin:.75rem 0 0;max-width:520px">Built on real science, real AI, real deployed code</div>
-    <div class="cred-grid">
-      <div class="cred-cell"><div class="cred-icon">🧠</div><div class="cred-title">Google MediaPipe AI</div><div class="cred-desc">The same pose detection powering Google consumer apps. 33 skeletal landmarks tracked at 30fps — more accurate than wearables.</div></div>
-      <div class="cred-cell"><div class="cred-icon">✨</div><div class="cred-title">Gemini 1.5 Flash</div><div class="cred-desc">Google's fastest production AI generates personalized exercise plans in seconds, targeted to each employee's specific detected issues.</div></div>
-      <div class="cred-cell"><div class="cred-icon">🔒</div><div class="cred-title">Zero video storage</div><div class="cred-desc">All processing is on-device. No video frames leave the browser. GDPR-compliant by architecture — not policy.</div></div>
-      <div class="cred-cell"><div class="cred-icon">📊</div><div class="cred-title">5 detection algorithms</div><div class="cred-desc">Forward head · Back slouch · Uneven shoulders · Head drop · Shoulder hunch — with a confidence filter to eliminate false positives.</div></div>
-      <div class="cred-cell"><div class="cred-icon">🔬</div><div class="cred-title">Evidence-based exercises</div><div class="cred-desc">15 curated exercises, each mapped to specific posture issue types with recommended frequency, duration, and clinical benefit.</div></div>
-      <div class="cred-cell"><div class="cred-icon">⚡</div><div class="cred-title">Live and deployed today</div><div class="cred-desc">Not a prototype. Running on Vercel right now. Open it in another tab — it works. No login required to see posture analysis.</div></div>
+<!-- ─────────────── TRUST ─────────────── -->
+<div class="trust">
+  <div class="section-label up">Why teams trust PosturePro</div>
+  <div class="trust-grid">
+    <div class="trust-item up">
+      <svg class="trust-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 3L17 10H24L18.5 14.5L20.5 22L14 17.5L7.5 22L9.5 14.5L4 10H11L14 3Z"/>
+      </svg>
+      <h3>No Install Required</h3>
+      <p>Runs in any modern browser. No plugins, no software, no IT ticket. Employees are analyzing posture within 30 seconds of the link opening.</p>
+    </div>
+    <div class="trust-item up" style="transition-delay:.1s">
+      <svg class="trust-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="5" width="18" height="18" rx="3"/>
+        <path d="M10 14l3 3 5-5"/>
+      </svg>
+      <h3>On-Device Processing</h3>
+      <p>All skeleton tracking runs locally in the browser. Camera data never leaves the device. No biometric storage, no compliance risk.</p>
+    </div>
+    <div class="trust-item up" style="transition-delay:.2s">
+      <svg class="trust-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="14" cy="14" r="10"/>
+        <path d="M14 9v5l3 3"/>
+      </svg>
+      <h3>Real-Time Alerts</h3>
+      <p>Posture issues flagged in under 15 seconds of detection. Gentle on-screen nudges correct behavior before it becomes chronic injury.</p>
     </div>
   </div>
-</section>
+</div>
 
-<!-- CTA -->
-<section class="cta-sec fade-up">
-  <div class="cta-halo"></div>
-  <div class="container" style="position:relative;z-index:1">
-    <div class="eyebrow" style="justify-content:center;margin-bottom:1.5rem">Let's talk</div>
-    <h2 class="cta-h2">
-      Ready to protect<br>
-      <span id="ctaCompany">your team's</span> health<br>
-      and your bottom line?
-    </h2>
-    <p class="cta-sub">5 minutes to set up. No hardware. No subscriptions until you're convinced it delivers. Let's run a pilot with your team.</p>
-    <div class="cta-btns">
-      <a href="https://posture-pro-gamma.vercel.app/" target="_blank" rel="noopener" class="btn btn-accent" style="font-size:15px;padding:14px 32px">Try PosturePro Free →</a>
-      <a href="mailto:sumith.guru@hrud.ai?subject=PosturePro%20for%20our%20team&body=Hi%2C%20I%20saw%20the%20PosturePro%20pitch%20page%20and%20would%20love%20to%20discuss%20rolling%20it%20out%20for%20our%20team." class="btn btn-ghost" style="font-size:15px;padding:14px 32px">Book a Demo →</a>
-    </div>
+<!-- ─────────────── CTA ─────────────── -->
+<div class="cta-section">
+  <div class="cta-label up">Ready when you are</div>
+  <h2 class="cta-h2 up" style="transition-delay:.08s">
+    Stop the<br><span>silent</span> cost.
+  </h2>
+  <p class="cta-sub up" style="transition-delay:.16s">
+    Open the live app now — no signup needed to see the posture detection working in real time.
+  </p>
+  <a href="https://posture-pro-gamma.vercel.app/" class="cta-btn up" style="transition-delay:.24s">
+    Open PosturePro
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 14L14 4M14 4H6M14 4V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+  <div class="cta-legal up" style="transition-delay:.3s">
+    No account required &middot; Works in browser &middot; Free to explore
   </div>
-</section>
+</div>
 
-<!-- FOOTER -->
+<!-- ─────────────── FOOTER ─────────────── -->
 <footer>
-  <p>© 2026 PosturePro · <a href="mailto:sumith.guru@hrud.ai">sumith.guru@hrud.ai</a></p>
-  <a href="https://posture-pro-gamma.vercel.app/" target="_blank" rel="noopener">Live App ↗</a>
+  <div class="footer-logo">
+    <div class="pulse"></div>
+    PosturePro
+  </div>
+  <div class="footer-r">posture-pro-gamma.vercel.app &nbsp;&middot;&nbsp; &copy; 2026</div>
 </footer>
 
 <script>
-(function(){
-  var p = new URLSearchParams(window.location.search);
-  var co = p.get('company') || p.get('c');
-  if (!co) return;
-  var name = decodeURIComponent(co).trim();
-  document.getElementById('companyName').textContent = name;
-  document.getElementById('roiCompanyName').textContent = name + "'s team";
-  document.getElementById('ctaCompany').textContent = name + "'s";
-})();
+/* ── Scroll reveal ── */
+const obs = new IntersectionObserver(es => {
+  es.forEach(e => { if(e.isIntersecting) e.target.classList.add('in') })
+}, { threshold: 0.08 })
+document.querySelectorAll('.up').forEach(el => obs.observe(el))
 
-function fmt(n){
-  if(n>=1000000) return '$'+(n/1000000).toFixed(1)+'M';
-  if(n>=1000)    return '$'+Math.round(n/1000)+'K';
-  return '$'+n.toLocaleString();
+/* ── Ticker ── */
+const items = [
+  ['$20K','avg. MSK cost per worker/yr'],
+  ['$650B','annual US productivity loss'],
+  ['67%','remote workers: worsening back pain'],
+  ['1 in 5','desk workers affected now'],
+  ['30%','injury cost reduction possible'],
+  ['15 sec','time to first detection'],
+  ['73%','avg. good-posture rate after 1 week'],
+  ['Zero','installs needed'],
+]
+const t = document.getElementById('ticker')
+const row = items.map(([v,l])=>`<span class="ticker-item"><b>${v}</b> &nbsp;${l}<span class="ticker-sep"> &nbsp;/&nbsp; </span></span>`).join('')
+t.innerHTML = row + row // duplicate for seamless loop
+
+/* ── ROI Calculator ── */
+function fmt(n){ return '$'+Math.round(n).toLocaleString() }
+function updateROI(v){
+  var team = parseInt(v)
+  document.getElementById('teamVal').textContent = team.toLocaleString()
+  var at = Math.round(team * 0.20)
+  var inaction = at * 20000
+  var ppCost = team * 12 * 12
+  var gross = inaction * 0.30
+  var sav = gross - ppCost
+  var roi = sav > 0 ? (sav / ppCost).toFixed(1) : '0'
+  document.getElementById('atRisk').textContent = at.toLocaleString()
+  document.getElementById('inactionCost').textContent = fmt(inaction)
+  document.getElementById('netSav').textContent = sav > 0 ? fmt(sav) : '$0'
+  document.getElementById('roiX').textContent = roi
 }
-function updateROI(val){
-  var t = parseInt(val);
-  document.getElementById('sliderDisplay').textContent = t.toLocaleString();
-  var affected = Math.round(t * 0.20);
-  var inaction  = affected * 20000;
-  var ppCost    = t * 12 * 12;
-  var preventable = inaction * 0.30;
-  var savings   = preventable - ppCost;
-  var roi = savings > 0 ? (savings / ppCost).toFixed(1) : '0';
-  document.getElementById('costInaction').textContent = fmt(inaction);
-  document.getElementById('ppCost').textContent       = fmt(ppCost);
-  document.getElementById('netSavings').textContent   = savings > 0 ? fmt(savings) : '$0';
-  document.getElementById('roiMult').textContent      = roi + '×';
-  document.getElementById('costNote').textContent     = affected + ' employees affected × $20K average cost';
+updateROI(200)
+
+/* ── Counter animation ── */
+const counters = document.querySelectorAll('[data-count]')
+const cobs = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if(!e.isIntersecting) return
+    const el = e.target, target = +el.dataset.count, dur = 1400
+    let start = null
+    const step = ts => {
+      if(!start) start = ts
+      const p = Math.min((ts-start)/dur, 1)
+      el.textContent = Math.round(p * target)
+      if(p<1) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+    cobs.unobserve(el)
+  })
+}, { threshold: 0.5 })
+counters.forEach(el => cobs.observe(el))
+
+/* ── URL personalisation: ?c=CompanyName ── */
+const p = new URLSearchParams(location.search)
+const co = p.get('c') || p.get('company')
+if(co){
+  const h = document.querySelector('.hero-h1')
+  if(h) h.innerHTML = `${co}&rsquo;s team<br>is <em>losing</em><br>money daily.`
 }
-document.getElementById('teamSlider').addEventListener('input', function(){ updateROI(this.value); });
-updateROI(150);
-
-var obs = new IntersectionObserver(function(entries){
-  entries.forEach(function(e){
-    if(!e.isIntersecting) return;
-    e.target.classList.add('visible');
-    e.target.querySelectorAll('.counter').forEach(function(el){
-      var target = parseInt(el.dataset.target, 10), current = 0;
-      var step = Math.max(1, Math.ceil(target / 45));
-      var timer = setInterval(function(){
-        current = Math.min(current + step, target);
-        el.textContent = current;
-        if(current >= target) clearInterval(timer);
-      }, 28);
-    });
-    obs.unobserve(e.target);
-  });
-}, {threshold: 0.12});
-document.querySelectorAll('.fade-up').forEach(function(el){ obs.observe(el); });
-
-var secs = 32;
-setInterval(function(){
-  secs++;
-  var m = Math.floor(secs/60), s = secs%60;
-  var el = document.getElementById('faux-time');
-  if(el) el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
-}, 1000);
-
-var scores = [78,74,81,76,83,79,85,72,80], si = 0;
-setInterval(function(){
-  si = (si+1) % scores.length;
-  var el = document.getElementById('faux-score');
-  if(el) el.textContent = scores[si] + '%';
-}, 2800);
 </script>
 </body>
 </html>
